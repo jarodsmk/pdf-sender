@@ -9,7 +9,6 @@ function getPdfFiles() {
   return fs.readdirSync(folderPath).filter(file => file.endsWith('.pdf'));
 }
 
-// Function to send a batch of PDF files via email
 async function sendBatchEmails(transporter, pdfFiles) {
   const batchSize = 5;
   let currentBatch = [];
@@ -33,27 +32,24 @@ async function sendBatchEmails(transporter, pdfFiles) {
     }
   }
 
-  // Send any remaining files
   if (currentBatch.length > 0) {
     await sendEmail(transporter, currentBatch);
   }
 }
 
-// Function to send an email with attachments
 async function sendEmail(transporter, attachments) {
   const mailOptions = {
-    from: process.env.FROM_EMAIL, // Your email address
-    to: process.env.TO_EMAIL, // Recipient's email address
+    from: process.env.FROM_EMAIL,
+    to: process.env.TO_EMAIL,
     subject: 'PDF Files',
     text: 'Here are the PDF files you requested.',
-    attachments: attachments
+    attachments
   };
 
   try {
     await transporter.sendMail(mailOptions);
     console.log('Email sent successfully');
     
-    // Move sent files to the './out' folder
     for (const attachment of attachments) {
       const oldPath = attachment.path;
       const newPath = path.join('./out', attachment.filename);
@@ -65,7 +61,6 @@ async function sendEmail(transporter, attachments) {
   }
 }
 
-// Configure the SMTP transporter
 const transporter = nodemailer.createTransport({
   service: 'Gmail',
   auth: {
@@ -74,6 +69,5 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-// Get the list of PDF files and send them in batches
 const pdfFiles = getPdfFiles();
 sendBatchEmails(transporter, pdfFiles);
