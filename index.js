@@ -35,6 +35,8 @@ async function sendBatchEmails(transporter, pdfFiles) {
   if (currentBatch.length > 0) {
     await sendEmail(transporter, currentBatch);
   }
+
+  console.log(`Finished processing files. Total sent: ${pdfFiles.length}`);
 }
 
 async function sendEmail(transporter, attachments) {
