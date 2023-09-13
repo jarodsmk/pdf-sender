@@ -4,17 +4,17 @@ const path = require('path');
 require('dotenv').config();
 
 // Function to get a list of PDF files in the './in' folder
-function getPdfFiles() {
+function getFiles() {
   const folderPath = './in';
-  return fs.readdirSync(folderPath).filter(file => file.endsWith('.pdf'));
+  return fs.readdirSync(folderPath).filter(file => file.endsWith(process.env.FILE_EXTENSION));
 }
 
-async function sendBatchEmails(transporter, pdfFiles) {
+async function sendBatchEmails(transporter, files) {
   const batchSize = 5;
   let currentBatch = [];
   let currentBatchSize = 0;
 
-  for (const pdfFile of pdfFiles) {
+  for (const pdfFile of files) {
     const filePath = path.join('./in', pdfFile);
     const fileStats = fs.statSync(filePath);
     const fileSizeInBytes = fileStats.size;
@@ -36,7 +36,7 @@ async function sendBatchEmails(transporter, pdfFiles) {
     await sendEmail(transporter, currentBatch);
   }
 
-  console.log(`Finished processing files. Total sent: ${pdfFiles.length}`);
+  console.log(`Finished processing files. Total sent: ${files.length}`);
 }
 
 async function sendEmail(transporter, attachments) {
@@ -71,5 +71,5 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-const pdfFiles = getPdfFiles();
+const pdfFiles = getFiles();
 sendBatchEmails(transporter, pdfFiles);
